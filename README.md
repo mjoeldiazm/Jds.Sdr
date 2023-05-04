@@ -1,1 +1,1 @@
-# Jds.Sdr
+# Joel Díaz - Sistema de Distancia Recorrida
