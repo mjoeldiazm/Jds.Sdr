@@ -1,0 +1,8 @@
+﻿﻿.custom-header {
+    padding: .3rem 0.5rem;
+    font-size: 1rem;
+    justify-content: left;
+    display: flex;
+    align-items: center;
+    border-radius: 0.25rem 0.25rem 0 0;
+}

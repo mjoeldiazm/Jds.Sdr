@@ -1,0 +1,25 @@
+﻿<AuthorizeView Roles="@RoleDefinitions.All" Context="NavContext">
+	<div class="sidebar me-1 jd-side-bar @StateCssClass">
+		<div class="text-primary fw-bold mx-2 mt-2 p-1 rounded jd-main-menu">
+			<span class="fas fa-house"></span>
+			<span class="ms-2">Principal</span>
+		</div>
+		<AuthorizeView Roles="@RoleDefinitions.All">
+			<DxTreeView AllowSelectNodes="true" CssClass="app-sidebar" AnimationType="LayoutAnimationType.Slide">
+				<Nodes>
+					<DataManagerTreeViewNode ComponentInformation="@EmployeeManager.ComponentInformation" />
+					<DataManagerTreeViewNode ComponentInformation="@BranchManager.ComponentInformation"
+											 Expanded="true">
+						<Nodes>
+							<DataManagerTreeViewNode ComponentInformation="@DistanceManager.ComponentInformation" />
+						</Nodes>
+					</DataManagerTreeViewNode>
+					<DataManagerTreeViewNode ComponentInformation="@CarrierManager.ComponentInformation" />
+					<DataManagerTreeViewNode ComponentInformation="@BranchTripManager.ComponentInformation" />
+					<DataManagerTreeViewNode ComponentInformation="@UserAccountManager.ComponentInformation" />
+					<DataManagerTreeViewNode ComponentInformation="@TripReport.ComponentInformation" />
+				</Nodes>
+			</DxTreeView>
+		</AuthorizeView>
+	</div>
+</AuthorizeView>

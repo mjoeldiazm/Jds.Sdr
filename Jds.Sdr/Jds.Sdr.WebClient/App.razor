@@ -1,0 +1,25 @@
+﻿<Router AppAssembly="@typeof(Program).Assembly">
+	<Found Context="routeData">
+		<CascadingValue Value="ErrorBoundary">
+			<ErrorBoundary @ref="ErrorBoundary">
+				<ChildContent>
+					<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+						<Authorizing>
+							<p>Autorizando...</p>
+						</Authorizing>
+					</AuthorizeRouteView>
+				</ChildContent>
+				<ErrorContent>
+					<ErrorRecovery />
+				</ErrorContent>
+			</ErrorBoundary>
+		</CascadingValue>
+	</Found>
+	<NotFound>
+		<CascadingAuthenticationState>
+			<LayoutView Layout="@typeof(MainLayout)">
+				<p>¡Lo siento!, no hay nada en esta ruta.</p>
+			</LayoutView>
+		</CascadingAuthenticationState>
+	</NotFound>
+</Router>

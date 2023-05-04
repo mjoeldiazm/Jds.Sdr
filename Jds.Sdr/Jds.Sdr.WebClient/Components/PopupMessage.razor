@@ -1,0 +1,74 @@
+﻿<DxPopup Visible="@Visible"
+    ShowCloseButton="false"
+    ShowFooter="true">
+    <HeaderTemplate>
+        <div class="custom-header bg-@HeaderColor.ToString().ToLower() text-@HeaderTextColor.ToString().ToLower() w-100">
+            @if (Icon is not PopupMessageIcon.None)
+            {
+                <span class="@IconCssClass me-2"></span>
+            }
+            @HeaderText
+        </div>
+    </HeaderTemplate>
+    <BodyTemplate>
+        <p class="m-2">
+            @Message
+        </p>
+    </BodyTemplate>
+    <FooterContentTemplate>
+        <div class="my-2 text-@ButtonAlignment.ToString().ToLower()">
+            @switch (ButtonSource)
+            {
+                case PopupMessageButtonSource.Default:
+                    if (!string.IsNullOrEmpty(DefaultFirstButtontText))
+                    {
+                        <DxButton Text="@DefaultFirstButtontText"
+                            RenderStyle="@DefaultFirstButtonRenderStyle"
+                            Click="@DefaultFirstButtonOnClick"
+                            CssClass="me-1">
+                        </DxButton>
+                    }
+                    if (!string.IsNullOrEmpty(DefaultSecondButtonText))
+                    {
+                        <DxButton Text="@DefaultSecondButtonText"
+                            RenderStyle="@DefaultSecondButtonRenderStyle"
+                            Click="@DefaultSecondButtonOnClick"
+                            CssClass="me-1">
+                        </DxButton>
+
+                    }
+                    if (!string.IsNullOrEmpty(DefaultThirdButtonText))
+                    {
+                        <DxButton Text="@DefaultThirdButtonText"
+                            RenderStyle="@DefaultThirdButtonRenderStyle"
+                            Click="@DefaultThirdButtonOnClick">
+                        </DxButton>
+                    }
+                    break;
+                case PopupMessageButtonSource.UserDefined:
+                    if (Buttons is not null)
+                    {
+                        foreach (var item in Buttons)
+                        {
+                            if (item != Buttons.Last())
+                            {
+                                <DxButton Text="@item.Text"
+                                    RenderStyle="@item.RenderStyle"
+                                    Click="@item.OnClickCallback"
+                                    CssClass="me-1">
+                                </DxButton>
+                            }
+                            else
+                            {
+                                <DxButton Text="@item.Text"
+                                    RenderStyle="@item.RenderStyle"
+                                    Click="@item.OnClickCallback">
+                                </DxButton>
+                            }
+                        }
+                    }
+                    break;
+            }
+        </div>
+    </FooterContentTemplate>
+</DxPopup>

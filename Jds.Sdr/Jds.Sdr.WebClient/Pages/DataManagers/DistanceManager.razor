@@ -1,0 +1,176 @@
+﻿@page "/Distances"
+@inherits DataManagerBaseComponent<DistanceView>
+
+<PageTitle>
+	@($"{DistanceManager.ComponentInformation.Title} - {Application.Title}")
+</PageTitle>
+
+<AuthorizeView Context="authorizeViewContext"
+			   Roles="@RoleDefinitions.All">
+	<Authorized>
+		<DxDataGrid @ref="DataGrid"
+					DataAsync="GetDataAsync"
+					SingleSelectedDataRow="SelectedModel"
+					SingleSelectedDataRowChanged="OnSelectedModelChanged"
+					KeyFieldName="Id"
+					EditMode="DataGridEditMode.PopupEditForm"
+					CssClass="text-primary jd-grid-header"
+					DataRowCssClass="jd-table-alt-row text-primary"
+					PopupEditFormCssClass="jd-edit-form"
+					PopupEditFormHeaderText="@string.Format("{0} {1}",
+										(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Edit),
+                                        DistanceManager.ComponentInformation.EntitySingularName)"
+					ShowFilterRow="ShowFilterRow"
+					ShowGroupPanel="true"
+					PagerPageSizeSelectorVisible="true"
+					PagerAllDataRowsItemVisible="true"
+					PagerAllowedPageSizes="AllowedPageSizes"
+					PageSize="DefaultPageSize"
+					PagerNavigationMode=PagerNavigationMode.InputBox
+					RowEditStart="OnRowEditStarting"
+					RowClick="OnRowClick"
+					LayoutRestoring="@OnLayoutRestoring"
+					LayoutChanged="@OnLayoutChanged">
+			<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" CssClass="text-primary">
+					<DxDataGridColumnChooserToolbarItem Alignment="ToolbarItemAlignment.Right" />
+					<DxToolbarItem>
+						<Template>
+							<div class="fw-bold p-1">
+								<span class="fas fa-@(DistanceManager.ComponentInformation.IconCssClass)"></span>
+								<span class="ms-1">
+									@($"{DistanceManager.ComponentInformation.Title}")
+								</span>
+							</div>
+						</Template>
+					</DxToolbarItem>
+					<DxToolbarItem Text="@ToolbarButtonTexts.New"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-circle-plus"
+								   Tooltip="@ToolbarTooltipTexts.New"
+								   BeginGroup="true"
+								   Click="OnAddNewClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Edit"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-pencil-alt"
+								   Tooltip="@ToolbarTooltipTexts.Edit"
+								   Enabled="IsAnyRowSelected"
+								   Click="OnEditClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Delete"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-trash-alt"
+								   Tooltip="@ToolbarTooltipTexts.Delete"
+								   Enabled="IsAnyRowSelected"
+								   Click="OnDeleteClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Update"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-rotate"
+								   Tooltip="@ToolbarTooltipTexts.Update"
+								   BeginGroup="true"
+								   Click="OnUpdateClick" />
+					<DxToolbarItem Text="@(ShowFilterRow ? ToolbarButtonTexts.HideFilters : ToolbarButtonTexts.ShowFilters)"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-filter"
+								   Tooltip="@ToolbarTooltipTexts.ShowHideFilters"
+								   BeginGroup="true"
+								   Checked="ShowFilterRow"
+								   Click="OnShowFilterRowClick" />
+				</DxToolbar>
+			</HeaderTemplate>
+			<Columns>
+				<DxDataGridColumn Field="@($"{nameof(DistanceView.Branch)}.{nameof(BranchView.Name)}")"
+								  Caption="@AttributeNames.Branch" />
+				<DxDataGridColumn Field="@($"{nameof(DistanceView.Employee)}.{nameof(EmployeeView.FullName)}")"
+								  Caption="@AttributeNames.Employee" />
+				<DxDataGridColumn Field="@nameof(DistanceView.DistanceInKilometers)"
+								  Caption="@AttributeReader.GetName(nameof(DistanceView.DistanceInKilometers))">
+					<DisplayTemplate>
+						<span class="d-block text-end">
+							@((context as DistanceView).DistanceInKilometers.ToString("N2", Application.FormatDefaultCulture))
+						</span>
+					</DisplayTemplate>
+				</DxDataGridColumn>
+			</Columns>
+			<EditFormTemplate>
+				<EditForm Model="EditContext.DataItem"
+						  Context="EditFormContext"
+						  OnValidSubmit="HandleValidSubmitAsync"
+						  OnInvalidSubmit="HandleInvalidSubmitAsync">
+					<DataAnnotationsValidator></DataAnnotationsValidator>
+					<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+						<DxFormLayoutGroup Caption="@FormLayoutGroupCaptions.Distances"
+										   CssClass="pt-2"
+										   ColSpanMd="12">
+							<DxFormLayoutItem Caption="@AttributeNames.Branch"
+											  ColSpanMd="4" ColSpanSm="4" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Branches"
+												TextFieldName="@nameof(BranchView.Name)"
+												ValueFieldName="@nameof(BranchView.Id)"
+												@bind-Value="EditContext.DataItem.BranchId"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.BranchId)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeNames.Employee"
+											  ColSpanMd="4" ColSpanSm="4" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Employees"
+												TextFieldName="@nameof(EmployeeView.FullName)"
+												ValueFieldName="@nameof(EmployeeView.Id)"
+												@bind-Value="EditContext.DataItem.EmployeeId"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.EmployeeId)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(DistanceView.DistanceInKilometers))"
+											  ColSpanMd="4" ColSpanSm="4" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxSpinEdit @bind-Value="@EditContext.DataItem.DistanceInKilometers"
+												MaxValue="NumericValidations.MaximumDistanceInKilometers"
+												MinValue="NumericValidations.MinimumDistanceInKilometers"
+												Increment="NumericInput.MinimumDistanceInKilometersIncrement">
+										<DxNumericMaskProperties Culture="Application.FormatDefaultCulture" />
+									</DxSpinEdit>
+									<ValidationMessage For="@(() => EditContext.DataItem.DistanceInKilometers)" />
+								</Template>
+							</DxFormLayoutItem>
+						</DxFormLayoutGroup>
+						<DxFormLayoutItem ColSpanMd="12"
+										  Context="FormLayoutContext">
+							<Template>
+								<EditFormButtons IsSavingChanges="IsSavingChanges"
+												 SubmitFormOnClick="true"
+												 DataOperation="DataOperation"
+												 OnClickCancelButton="OnCancelButtonClick" />
+							</Template>
+						</DxFormLayoutItem>
+					</DxFormLayout>
+				</EditForm>
+			</EditFormTemplate>
+		</DxDataGrid>
+		<PopupMessage HeaderText="@DialogHeaderTexts.Confirmation"
+					  Message="@DialogMessages.ConfirmDelete"
+					  Icon="PopupMessageIcon.Question"
+					  ButtonDefaultText="PopupMessageButtonDefaultText.YesNo"
+					  Visible="@ConfirmationDialogVisible"
+					  DefaultFirstButtonOnClick="@DeleteItemsAsync"
+					  DefaultSecondButtonOnClick="@OnCancelButtonClick" />
+		<ToastMessage @ref="ToastMessage" />
+	</Authorized>
+	<NotAuthorized>
+		@{
+			NavigationManager.NavigateTo(RouteAttributeReader.GetValue(typeof(Login)));
+		}
+	</NotAuthorized>
+</AuthorizeView>

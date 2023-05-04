@@ -1,0 +1,32 @@
+﻿<div class="text-@Alignment.ToString().ToLower()">
+    <DxButton RenderStyle="@PrimaryButtonRenderStyle"
+        SubmitFormOnClick="@SubmitFormOnClick"
+        Click="OnPrimaryClick"
+        Enabled="@(!IsSavingChanges)"
+        CssClass="me-1"
+        Context="PrimaryButtonContext"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="@(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Update)" >
+
+        @if (IsSavingChanges)
+        {
+            <span class="spinner-grow spinner-grow-sm me-2"
+                role="status"
+                aria-hidden="true"></span>
+            <span>@(DataOperation == DataOperation.Insert ? DialogButtonTexts.Adding : DialogButtonTexts.Updating)</span>
+        }
+        else
+        {
+            <span>@(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Update)</span>
+        }
+
+    </DxButton>
+    <DxButton RenderStyle="@CancelButtonRenderStyle"
+        Click="@OnCancelClick"
+        Text="Cancelar"
+        Enabled="@(!IsSavingChanges)"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="@DialogTooltipTexts.DiscardChanges" />
+</div>

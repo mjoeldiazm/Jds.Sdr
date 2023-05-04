@@ -1,0 +1,169 @@
+﻿@page "/UserAccountsViewer"
+@inherits DataManagerBaseComponent<UserAccountView>
+
+<PageTitle>
+	@($"{UserAccountManager.ComponentInformation.Title} - {Application.Title}")
+</PageTitle>
+
+<AuthorizeView Context="authorizeViewContext"
+			   Roles="@RoleDefinitions.Administrator">
+	<Authorized>
+		<DxDataGrid @ref="DataGrid"
+					DataAsync="GetDataAsync"
+					SingleSelectedDataRow="SelectedModel"
+					SingleSelectedDataRowChanged="OnSelectedModelChanged"
+					KeyFieldName="Id"
+					EditMode="DataGridEditMode.PopupEditForm"
+					CssClass="text-primary jd-grid-header"
+					DataRowCssClass="jd-table-alt-row text-primary"
+					PopupEditFormCssClass="jd-edit-form"
+					PopupEditFormHeaderText="@string.Format("{0} {1}",
+										(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Edit),
+                                        UserAccountManager.ComponentInformation.EntitySingularName)"
+					ShowFilterRow="ShowFilterRow"
+					ShowGroupPanel="true"
+					PagerPageSizeSelectorVisible="true"
+					PagerAllDataRowsItemVisible="true"
+					PagerAllowedPageSizes="AllowedPageSizes"
+					PageSize="DefaultPageSize"
+					PagerNavigationMode=PagerNavigationMode.InputBox
+					RowEditStart="OnRowEditStarting"
+					RowClick="OnRowClick"
+					LayoutRestoring="@OnLayoutRestoring"
+					LayoutChanged="@OnLayoutChanged">
+			<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" CssClass="text-primary">
+					<DxDataGridColumnChooserToolbarItem Alignment="ToolbarItemAlignment.Right" />
+					<DxToolbarItem>
+						<Template>
+							<div class="fw-bold p-1">
+								<span class="fas fa-@(UserAccountManager.ComponentInformation.IconCssClass)"></span>
+								<span class="ms-1">@UserAccountManager.ComponentInformation.Title</span>
+							</div>
+						</Template>
+					</DxToolbarItem>
+					<DxToolbarItem Text="@ToolbarButtonTexts.New"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-circle-plus"
+								   Tooltip="@ToolbarTooltipTexts.New"
+								   BeginGroup="true"
+								   Click="OnAddNewClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Edit"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-pencil-alt"
+								   Tooltip="@ToolbarTooltipTexts.Edit"
+								   Enabled="IsAnyRowSelected && CanEditSelectedModel"
+								   Click="OnEditClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Delete"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-trash-alt"
+								   Tooltip="@ToolbarTooltipTexts.Delete"
+								   Enabled="IsAnyRowSelected && CanDeleteSelectedModel"
+								   Click="OnDeleteClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Update"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-rotate"
+								   Tooltip="@ToolbarTooltipTexts.Update"
+								   BeginGroup="true"
+								   Click="OnUpdateClick" />
+					<DxToolbarItem Text="@(ShowFilterRow ? ToolbarButtonTexts.HideFilters : ToolbarButtonTexts.ShowFilters)"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-filter"
+								   Tooltip="@ToolbarTooltipTexts.ShowHideFilters"
+								   BeginGroup="true"
+								   Checked="ShowFilterRow"
+								   Click="OnShowFilterRowClick" />
+				</DxToolbar>
+			</HeaderTemplate>
+			<Columns>
+				<DxDataGridColumn Field="@($"{nameof(UserAccountView.Employee)}.{nameof(UserAccountView.Employee.FullName)}")"
+								  Caption="@AttributeNames.Employee" />
+				<DxDataGridColumn Field="@nameof(UserAccountView.EmailAddress)"
+								  Caption="@AttributeNames.EmailAddress" />
+				<DxDataGridColumn Field="@nameof(UserAccountView.PhoneNumber)"
+								  Caption="@AttributeNames.PhoneNumber"
+								  Visible="false" />
+				<DxDataGridColumn Field="@($"{nameof(UserAccountView.Role)}")"
+								  Caption="@AttributeNames.Role" />
+			</Columns>
+			<EditFormTemplate>
+				<EditForm Model="EditContext.DataItem"
+						  Context="EditFormContext"
+						  OnValidSubmit="HandleValidSubmitAsync"
+						  OnInvalidSubmit="HandleInvalidSubmitAsync">
+					<DataAnnotationsValidator></DataAnnotationsValidator>
+					<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+						<DxFormLayoutGroup Caption="Datos Generales"
+										   ColSpanMd="12">
+							<DxFormLayoutItem Caption="@AttributeNames.Employee"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Employees"
+												Context="EmployeeContext"
+												TextFieldName="@nameof(EmployeeView.FullName)"
+												ValueFieldName="@nameof(EmployeeView.Id)"
+												@bind-Value="EditContext.DataItem.EmployeeId"
+												SelectedItemChanged="@((EmployeeView employee) => SelectedEmployeeChanged(employee))"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+												Enabled="DataOperation == DataOperation.Insert">
+										<ItemTemplate>
+											<div class="fw-bold">
+												@EmployeeContext.FullName
+											</div>
+											<div class="text-dark">
+												@($"{AttributeNames.EmailAddress}: {EmployeeContext.EmailAddress}")
+											</div>
+										</ItemTemplate>
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.EmployeeId)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeNames.Role"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Roles"
+												TextFieldName="@nameof(RoleView.Name)"
+												ValueFieldName="@nameof(RoleView.Name)"
+												@bind-Value="EditContext.DataItem.Role"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.Role)" />
+								</Template>
+							</DxFormLayoutItem>
+						</DxFormLayoutGroup>
+						<DxFormLayoutItem ColSpanMd="12"
+										  Context="FormLayoutContext">
+							<Template>
+								<EditFormButtons IsSavingChanges="IsSavingChanges"
+												 SubmitFormOnClick="true"
+												 DataOperation="DataOperation"
+												 OnClickCancelButton="OnCancelButtonClick" />
+							</Template>
+						</DxFormLayoutItem>
+					</DxFormLayout>
+				</EditForm>
+			</EditFormTemplate>
+		</DxDataGrid>
+		<PopupMessage HeaderText="@DialogHeaderTexts.Confirmation"
+					  Message="@DialogMessages.ConfirmDelete"
+					  Icon="PopupMessageIcon.Question"
+					  ButtonDefaultText="PopupMessageButtonDefaultText.YesNo"
+					  Visible="@ConfirmationDialogVisible"
+					  DefaultFirstButtonOnClick="@DeleteItemsAsync"
+					  DefaultSecondButtonOnClick="@OnCancelButtonClick" />
+
+		<ToastMessage @ref="ToastMessage" />
+
+	</Authorized>
+	<NotAuthorized>
+		@{
+			NavigationManager.NavigateTo(RouteAttributeReader.GetValue(typeof(Login)));
+		}
+	</NotAuthorized>
+</AuthorizeView>

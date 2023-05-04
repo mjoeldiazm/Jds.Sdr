@@ -1,0 +1,35 @@
+﻿<div class="card w-100 border-0 border-start border-2 ms-1">
+	<div class="card-body p-0">
+		<DxMenu Title="@Application.SimplifiedTitle"
+				ItemsPosition="ItemPosition.End"
+				HamburgerButtonPosition="MenuHamburgerButtonPosition.Right"
+				CollapseItemsToHamburgerMenu="true"
+				CssClass="text-primary"
+				Orientation="DevExpress.Blazor.Orientation.Horizontal"
+				DisplayMode="MenuDisplayMode.Auto"
+				DropDownActionMode="MenuDropDownActionMode.Click"
+				CollapseItemToIconMode="MenuCollapseItemToIconMode.Sequentially">
+			<Items>
+				<AuthorizeView>
+					<Authorized>
+						<DxMenuItem Text="@($"Hola, {context.User.Identity.Name}")"
+									IconCssClass="fas fa-user-circle fa-2x text-primary">
+							<Items>
+								<DxMenuItem Text="Cerrar sesión"
+											NavigateUrl="/Logout"
+											CssClass="text-primary"
+											IconCssClass="fas fa-right-from-bracket"/>
+							</Items>
+						</DxMenuItem>
+					</Authorized>
+					<NotAuthorized>
+						<DxMenuItem Text="Iniciar sesión"
+									NavigateUrl="/Login"
+									IconCssClass="fas fa-user-circle fa-2x text-primary">
+						</DxMenuItem>
+					</NotAuthorized>
+				</AuthorizeView>
+			</Items>
+		</DxMenu>
+	</div>
+</div>

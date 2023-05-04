@@ -1,0 +1,195 @@
+﻿@page "/CarriersViewer"
+@inherits DataManagerBaseComponent<CarrierView>
+
+<PageTitle>
+	@($"{CarrierManager.ComponentInformation.Title} - {Application.Title}")
+</PageTitle>
+
+<AuthorizeView Context="authorizeViewContext"
+			   Roles="@RoleDefinitions.Administrator">
+	<Authorized>
+		<DxDataGrid @ref="DataGrid"
+					DataAsync="GetDataAsync"
+					SingleSelectedDataRow="SelectedModel"
+					SingleSelectedDataRowChanged="OnSelectedModelChanged"
+					KeyFieldName="Id"
+					EditMode="DataGridEditMode.PopupEditForm"
+					CssClass="text-primary jd-grid-header"
+					DataRowCssClass="jd-table-alt-row text-primary"
+					PopupEditFormCssClass="jd-edit-form"
+					PopupEditFormHeaderText="@string.Format("{0} {1}",
+										(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Edit),
+                                        CarrierManager.ComponentInformation.EntitySingularName)"
+					ShowFilterRow="ShowFilterRow"
+					ShowGroupPanel="true"
+					PagerPageSizeSelectorVisible="true"
+					PagerAllDataRowsItemVisible="true"
+					PagerAllowedPageSizes="AllowedPageSizes"
+					PageSize="DefaultPageSize"
+					PagerNavigationMode=PagerNavigationMode.InputBox
+					RowEditStart="OnRowEditStarting"
+					RowClick="OnRowClick"
+					LayoutRestoring="@OnLayoutRestoring"
+					LayoutChanged="@OnLayoutChanged">
+			<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" CssClass="text-primary">
+					<DxDataGridColumnChooserToolbarItem Alignment="ToolbarItemAlignment.Right" />
+					<DxToolbarItem>
+						<Template>
+							<div class="fw-bold p-1">
+								<span class="fas fa-@(CarrierManager.ComponentInformation.IconCssClass)"></span>
+								<span class="ms-1">@CarrierManager.ComponentInformation.Title</span>
+							</div>
+						</Template>
+					</DxToolbarItem>
+					<DxToolbarItem Text="@ToolbarButtonTexts.New"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-circle-plus"
+								   Tooltip="@ToolbarTooltipTexts.New"
+								   BeginGroup="true"
+								   Click="OnAddNewClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Edit"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-pencil-alt"
+								   Tooltip="@ToolbarTooltipTexts.Edit"
+								   Enabled="IsAnyRowSelected && CanEditSelectedModel"
+								   Click="OnEditClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Delete"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-trash-alt"
+								   Tooltip="@ToolbarTooltipTexts.Delete"
+								   Enabled="IsAnyRowSelected && CanDeleteSelectedModel"
+								   Click="OnDeleteClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Update"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-rotate"
+								   Tooltip="@ToolbarTooltipTexts.Update"
+								   BeginGroup="true"
+								   Click="OnUpdateClick" />
+					<DxToolbarItem Text="@(ShowFilterRow ? ToolbarButtonTexts.HideFilters : ToolbarButtonTexts.ShowFilters)"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-filter"
+								   Tooltip="@ToolbarTooltipTexts.ShowHideFilters"
+								   BeginGroup="true"
+								   Checked="ShowFilterRow"
+								   Click="OnShowFilterRowClick" />
+				</DxToolbar>
+			</HeaderTemplate>
+			<Columns>
+				<DxDataGridColumn Field="@nameof(CarrierView.FullName)"
+								  Caption="@AttributeReader.GetName(nameof(CarrierView.FullName))" />
+				<DxDataGridColumn Field="@nameof(CarrierView.IdentityNationalDocument)"
+								  Caption="@AttributeReader.GetName(nameof(CarrierView.IdentityNationalDocument))" />
+				<DxDataGridColumn Field="@nameof(CarrierView.EmailAddress)"
+								  Caption="@AttributeReader.GetName(nameof(CarrierView.EmailAddress))" />
+				<DxDataGridColumn Field="@nameof(CarrierView.PhoneNumber)"
+								  Caption="@AttributeReader.GetName(nameof(CarrierView.PhoneNumber))" />
+				<DxDataGridColumn Field="@nameof(DistanceView.DistanceInKilometers)"
+								  Caption="@AttributeReader.GetName(nameof(CarrierView.RatePerKilometer))">
+					<DisplayTemplate>
+						<span class="d-block text-end">
+							@((context as CarrierView).RatePerKilometer.ToString("N2", Application.FormatDefaultCulture))
+						</span>
+					</DisplayTemplate>
+				</DxDataGridColumn>
+			</Columns>
+			<EditFormTemplate>
+				<EditForm Model="EditContext.DataItem"
+						  Context="EditFormContext"
+						  OnValidSubmit="HandleValidSubmitAsync"
+						  OnInvalidSubmit="HandleInvalidSubmitAsync">
+					<DataAnnotationsValidator></DataAnnotationsValidator>
+					<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+						<DxFormLayoutGroup Caption="Datos Generales"
+										   ColSpanMd="12">
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(CarrierView.FirstName))"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxTextBox @bind-Text="@EditContext.DataItem.FirstName" />
+									<ValidationMessage For="@(() => EditContext.DataItem.FirstName)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(CarrierView.LastName))"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxTextBox @bind-Text="@EditContext.DataItem.LastName" />
+									<ValidationMessage For="@(() => EditContext.DataItem.LastName)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(CarrierView.IdentityNationalDocument))"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxMaskedInput @bind-Value="@EditContext.DataItem.IdentityNationalDocument"
+												   Mask="@InputMasks.IdentityNationalDocument"
+												   MaskMode="MaskMode.Text" />
+									<ValidationMessage For="@(() => EditContext.DataItem.IdentityNationalDocument)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(CarrierView.EmailAddress))"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxTextBox @bind-Text="@EditContext.DataItem.EmailAddress" />
+									<ValidationMessage For="@(() => EditContext.DataItem.EmailAddress)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(CarrierView.PhoneNumber))"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxMaskedInput @bind-Value="@EditContext.DataItem.PhoneNumber"
+												   Mask="@InputMasks.PhoneNumber"
+												   MaskMode="MaskMode.Text" />
+									<ValidationMessage For="@(() => EditContext.DataItem.PhoneNumber)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(CarrierView.RatePerKilometer))"
+											  ColSpanMd="6" ColSpanSm="6" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxSpinEdit @bind-Value="@EditContext.DataItem.RatePerKilometer"
+												MinValue="NumericInput.MinimumRatePerKilometerIncrement"
+												Increment="NumericInput.MinimumRatePerKilometerIncrement">
+										<DxNumericMaskProperties Culture="Application.FormatDefaultCulture" />
+									</DxSpinEdit>
+									<ValidationMessage For="@(() => EditContext.DataItem.RatePerKilometer)" />
+								</Template>
+							</DxFormLayoutItem>
+						</DxFormLayoutGroup>
+						<DxFormLayoutItem ColSpanMd="12"
+										  Context="FormLayoutContext">
+							<Template>
+								<EditFormButtons IsSavingChanges="IsSavingChanges"
+												 SubmitFormOnClick="true"
+												 DataOperation="DataOperation"
+												 OnClickCancelButton="OnCancelButtonClick" />
+							</Template>
+						</DxFormLayoutItem>
+					</DxFormLayout>
+				</EditForm>
+			</EditFormTemplate>
+		</DxDataGrid>
+		<PopupMessage HeaderText="@DialogHeaderTexts.Confirmation"
+					  Message="@DialogMessages.ConfirmDelete"
+					  Icon="PopupMessageIcon.Question"
+					  ButtonDefaultText="PopupMessageButtonDefaultText.YesNo"
+					  Visible="@ConfirmationDialogVisible"
+					  DefaultFirstButtonOnClick="@DeleteItemsAsync"
+					  DefaultSecondButtonOnClick="@OnCancelButtonClick" />
+		<ToastMessage @ref="ToastMessage" />
+	</Authorized>
+	<NotAuthorized>
+		@{
+			NavigationManager.NavigateTo(RouteAttributeReader.GetValue(typeof(Login)));
+		}
+	</NotAuthorized>
+</AuthorizeView>

@@ -1,0 +1,162 @@
+﻿@page "/TripDistances"
+@inherits DataManagerBaseComponent<TripDistanceView>
+
+<PageTitle>
+	@($"{TripDistanceManager.ComponentInformation.Title} - {Application.Title}")
+</PageTitle>
+
+<AuthorizeView Context="authorizeViewContext"
+			   Roles="@RoleDefinitions.All">
+	<Authorized>
+		<DxDataGrid @ref="DataGrid"
+					DataAsync="GetDataAsync"
+					SingleSelectedDataRow="SelectedModel"
+					SingleSelectedDataRowChanged="OnSelectedModelChanged"
+					KeyFieldName="Id"
+					EditMode="DataGridEditMode.PopupEditForm"
+					CssClass="text-primary jd-grid-header"
+					DataRowCssClass="jd-table-alt-row text-primary"
+					PopupEditFormCssClass="jd-edit-form-50"
+					PopupEditFormHeaderText="@string.Format("{0} {1}",
+										(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Edit),
+                                        TripDistanceManager.ComponentInformation.EntitySingularName)"
+					ShowFilterRow="ShowFilterRow"
+					ShowGroupPanel="true"
+					PagerPageSizeSelectorVisible="true"
+					PagerAllDataRowsItemVisible="true"
+					PagerAllowedPageSizes="AllowedPageSizes"
+					PageSize="DefaultPageSize"
+					PagerNavigationMode=PagerNavigationMode.InputBox
+					RowEditStart="OnRowEditStarting"
+					RowClick="OnRowClick"
+					LayoutRestoring="@OnLayoutRestoring"
+					LayoutChanged="@OnLayoutChanged">
+			<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" CssClass="text-primary">
+					<DxDataGridColumnChooserToolbarItem Alignment="ToolbarItemAlignment.Right" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Back"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-circle-arrow-left"
+								   Tooltip="@ToolbarTooltipTexts.Back"
+								   BeginGroup="true"
+								   Click="GoToTripManager" />
+					<DxToolbarItem BeginGroup="true">
+						<Template>
+							<div class="fw-bold p-1">
+								<span class="fas fa-@(TripDistanceManager.ComponentInformation.IconCssClass)"></span>
+								<span class="ms-1">
+									@($"{TripDistanceManager.ComponentInformation.Title}: {SelectedTrip?.Branch.Name} - {SelectedTrip?.Date.ToString("d")}")
+								</span>
+							</div>
+						</Template>
+					</DxToolbarItem>
+					<DxToolbarItem Text="@ToolbarButtonTexts.New"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-circle-plus"
+								   Tooltip="@ToolbarTooltipTexts.New"
+								   BeginGroup="true"
+								   Click="OnAddNewClick"
+								   Enabled="CurrentUserIsAdministratorOrStoreManager" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Delete"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-trash-alt"
+								   Tooltip="@ToolbarTooltipTexts.Delete"
+								   Enabled="IsAnyRowSelected && CurrentUserIsAdministratorOrStoreManager"
+								   Click="OnDeleteClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Update"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-rotate"
+								   Tooltip="@ToolbarTooltipTexts.Update"
+								   BeginGroup="true"
+								   Click="OnUpdateClick" />
+					<DxToolbarItem Text="@(ShowFilterRow ? ToolbarButtonTexts.HideFilters : ToolbarButtonTexts.ShowFilters)"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-filter"
+								   Tooltip="@ToolbarTooltipTexts.ShowHideFilters"
+								   BeginGroup="true"
+								   Checked="ShowFilterRow"
+								   Click="OnShowFilterRowClick" />
+				</DxToolbar>
+			</HeaderTemplate>
+			<Columns>
+				<DxDataGridColumn Field="@($"{nameof(TripDistanceView.Distance)}.{nameof(DistanceView.Employee)}.{nameof(EmployeeView.FullName)}")"
+								  Caption="@AttributeNames.Employee" />
+				<DxDataGridColumn Field="@($"{nameof(TripDistanceView.Distance)}.{nameof(DistanceView.DistanceInKilometers)}")"
+								  Caption="@AttributeNames.DistanceInKilometers">
+					<DisplayTemplate>
+						<span class="d-block text-end">
+							@((context as TripDistanceView).Distance.DistanceInKilometers.ToString("N2", Application.FormatDefaultCulture))
+						</span>
+					</DisplayTemplate>
+				</DxDataGridColumn>
+			</Columns>
+			<TotalSummary>
+				<DxDataGridSummaryItem Field="@($"{nameof(TripDistanceView.Distance)}.{nameof(DistanceView.DistanceInKilometers)}")"
+									   SummaryType=SummaryItemType.Sum
+									   DisplayFormat="Total recorrido: {0:N2}"
+									   Alignment="DataGridTextAlign.Right" />
+			</TotalSummary>
+			<EditFormTemplate>
+				<EditForm Model="EditContext.DataItem"
+						  Context="EditFormContext"
+						  OnValidSubmit="HandleValidSubmitAsync"
+						  OnInvalidSubmit="HandleInvalidSubmitAsync">
+					<DataAnnotationsValidator></DataAnnotationsValidator>
+					<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+						<DxFormLayoutGroup Caption="@FormLayoutGroupCaptions.Employees"
+										   CssClass="pt-2"
+										   ColSpanMd="12">
+							<DxFormLayoutItem Caption="@AttributeNames.Employee"
+											  ColSpanMd="12" ColSpanSm="12" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Distances"
+												Context="DistanceContext"
+												TextFieldName="@($"{nameof(DistanceView.Employee)}.{nameof(EmployeeView.FullName)}")"
+												ValueFieldName="@nameof(DistanceView.Id)"
+												@bind-Value="EditContext.DataItem.DistanceId"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+												Enabled="DataOperation == DataOperation.Insert">
+										<ItemTemplate>
+											<div class="fw-bold">
+												@DistanceContext.Employee.FullName
+											</div>
+											<div class="text-dark">
+												@($"{AttributeNames.DistanceInKilometers}: {DistanceContext.DistanceInKilometers.ToString("N2")}")
+											</div>
+										</ItemTemplate>
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.DistanceId)" />
+								</Template>
+							</DxFormLayoutItem>
+						</DxFormLayoutGroup>
+						<DxFormLayoutItem ColSpanMd="12"
+										  Context="FormLayoutContext">
+							<Template>
+								<EditFormButtons IsSavingChanges="IsSavingChanges"
+												 SubmitFormOnClick="true"
+												 DataOperation="DataOperation"
+												 OnClickCancelButton="OnCancelButtonClick" />
+							</Template>
+						</DxFormLayoutItem>
+					</DxFormLayout>
+				</EditForm>
+			</EditFormTemplate>
+		</DxDataGrid>
+		<PopupMessage HeaderText="@DialogHeaderTexts.Confirmation"
+					  Message="@DialogMessages.ConfirmDelete"
+					  Icon="PopupMessageIcon.Question"
+					  ButtonDefaultText="PopupMessageButtonDefaultText.YesNo"
+					  Visible="@ConfirmationDialogVisible"
+					  DefaultFirstButtonOnClick="@DeleteItemsAsync"
+					  DefaultSecondButtonOnClick="@OnCancelButtonClick" />
+		<ToastMessage @ref="ToastMessage" />
+	</Authorized>
+	<NotAuthorized>
+		@{
+			NavigationManager.NavigateTo(RouteAttributeReader.GetValue(typeof(Login)));
+		}
+	</NotAuthorized>
+</AuthorizeView>

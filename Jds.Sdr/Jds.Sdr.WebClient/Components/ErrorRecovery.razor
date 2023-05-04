@@ -1,0 +1,23 @@
+﻿<DxStackLayout CssClass="w-100" Orientation="Orientation.Vertical">
+	<Items>
+		<DxStackLayoutItem>
+			<Template>
+				<div class="my-3 text-danger">
+					<IndicatorGlyph IconCssClass="fa-light fa-face-confused"
+									Message="Un error acaba de ocurrir. Presiona el siguiente botón para
+										intentar regresar a la página anterior." />
+				</div>
+			</Template>
+		</DxStackLayoutItem>
+		<DxStackLayoutItem>
+			<Template>
+				<div class="text-center mt-5">
+					<DxButton Text="@DialogButtonTexts.Back"
+							  IconCssClass="fas fa-circle-arrow-left"
+							  Click="OnErrorRecoverClick"
+							  SizeMode="SizeMode.Medium" />
+				</div>
+			</Template>
+		</DxStackLayoutItem>
+	</Items>
+</DxStackLayout>

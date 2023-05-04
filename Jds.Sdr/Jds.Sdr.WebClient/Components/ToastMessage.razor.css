@@ -1,0 +1,11 @@
+﻿.jd-icon-color {
+    color: white;
+}
+
+.jd-rounded-top {
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.jd-rounded {
+    border-radius: 0.5rem;
+}

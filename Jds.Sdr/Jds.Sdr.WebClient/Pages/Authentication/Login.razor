@@ -1,0 +1,119 @@
+﻿@page "/Login"
+@layout SecurityLayout
+
+<PageTitle>
+	@($"Inicio de Sesión - {Application.Title}")
+</PageTitle>
+
+<DxLayoutBreakpoint DeviceSize="DeviceSize.Large" @bind-IsActive="@IsLargeScreen" />
+<DxLayoutBreakpoint DeviceSize="DeviceSize.XLarge" @bind-IsActive="@IsExtraLargeScreen" />
+
+<div class="border shadow bg-body m-3 rounded@((IsExtraLargeScreen || IsLargeScreen) ? " w-50 p-5" : " p-3")">
+	<DxGridLayout ColumnSpacing="16px" RowSpacing="8px">
+		<Rows>
+
+			@if (IsExtraLargeScreen || IsLargeScreen)
+			{
+				<DxGridLayoutRow Areas="left-bar center-bar right-bar" Height="auto" />
+			}
+			else
+			{
+				<DxGridLayoutRow Areas="left-bar" Height="auto" />
+				<DxGridLayoutRow Areas="center-bar" Height="auto" />
+				<DxGridLayoutRow Areas="right-bar" Height="auto" />
+			}
+		</Rows>
+		<Columns>
+			<DxGridLayoutColumn Width="4fr" />
+			@if (IsExtraLargeScreen || IsLargeScreen)
+			{
+				<DxGridLayoutColumn Width="1fr" />
+				<DxGridLayoutColumn Width="3fr" />
+			}
+		</Columns>
+		<Items>
+			<DxGridLayoutItem Area="left-bar">
+				<Template>
+					<div class="w-100 fw-bold mb-3 text-primary text-center">
+						<div class="w-100 text-center mb-3">
+							<img class="jd-logo img-fluid" src="/images/app-logo-primary-64.svg" alt="Application Logo" />
+						</div>
+						<div class="fs-4">
+							@Application.Title
+						</div>
+						<div class="my-3 fs-5">
+							Inicio de Sesión
+						</div>
+					</div>
+					<EditForm Model="Credentials"
+							  OnValidSubmit="OnValidSubmit"
+							  Context="EditFormContext">
+						<DataAnnotationsValidator />
+						<DxFormLayout Data="Credentials"
+									  CaptionPosition="CaptionPosition.Vertical">
+							<DxFormLayoutItem ColSpanMd="12">
+								<DxTextBox @bind-Text="Credentials.EmailAddress"
+										   CssClass="my-2"
+										   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+										   Enabled="@(!IsValidatingCredentials)"
+										   NullText="Correo Electrónico"
+										   SizeMode="SizeMode.Large" />
+								<ValidationMessage For="@(() => Credentials.EmailAddress)" />
+							</DxFormLayoutItem>
+							<DxFormLayoutItem ColSpanMd="12">
+								<Template>
+									<DxTextBox @bind-Text="Credentials.Password"
+											   CssClass="my-2"
+											   Password="true"
+											   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+											   Enabled="@(!IsValidatingCredentials)"
+											   NullText="Contraseña"
+											   SizeMode="SizeMode.Large" />
+									<ValidationMessage For="@(() => Credentials.Password)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem ColSpanMd="12" CssClass="text-center">
+								<Template>
+									<DxButton Context="LoginButtonContext"
+											  SubmitFormOnClick="true"
+											  Enabled="@(!IsValidatingCredentials)"
+											  SizeMode="SizeMode.Large">
+										@if (IsValidatingCredentials)
+										{
+											<span class="spinner-grow spinner-grow-sm me-2"
+											  role="status"
+											  aria-hidden="true"></span>
+											<span>@DialogButtonTexts.Validating</span>
+										}
+										else
+										{
+											<span>@DialogButtonTexts.Login</span>
+										}
+									</DxButton>
+								</Template>
+							</DxFormLayoutItem>
+						</DxFormLayout>
+					</EditForm>
+				</Template>
+			</DxGridLayoutItem>
+			<DxGridLayoutItem Area="center-bar"
+							  CssClass="text-center"
+							  Visible="(IsExtraLargeScreen || IsLargeScreen)">
+				<Template>
+					<div class="vr h-100 text-center">
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+			<DxGridLayoutItem Area="right-bar"
+							  Visible="(IsExtraLargeScreen || IsLargeScreen)">
+				<Template>
+					<div class="h-100 jd-align-center">
+						<img class="img-fluid" src="/images/bg-credentials.png" alt="Security" />
+					</div>
+				</Template>
+			</DxGridLayoutItem>
+		</Items>
+	</DxGridLayout>
+</div>
+
+<ToastMessage @ref="ToastMessage" />

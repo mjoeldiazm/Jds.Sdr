@@ -1,0 +1,53 @@
+﻿<div class="border border-light rounded text-primary">
+	<div class="d-flex flex-row align-items-center p-1">
+		<div class="p-1">
+			<span class="fas fa-file-spreadsheet"></span>
+			<span class="fw-bold jd-toolbar-item-text ms-1">Reporte de Tranporte</span>
+		</div>
+		<div class="jd-separator-item"></div>
+		<div class="p-1 jd-toolbar-item-text">
+			Transportista
+		</div>
+		<div class="p-1">
+			<DxComboBox Data="Carriers"
+						Context="CarrierContext"
+						TextFieldName="@nameof(CarrierView.FullName)"
+						Value="Carrier"
+						ValueExpression="@(() => Carrier)"
+						ValueChanged="@((CarrierView carrier) => OnCarrierChanged(carrier))"
+						FilteringMode="DataGridFilteringMode.Contains"
+						NullText="Seleccione..."
+						ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+				<ItemTemplate>
+					<div class="fw-bold">
+						@CarrierContext.FullName
+					</div>
+					<div class="text-dark">
+						@($"{AttributeNames.IdentityNationalDocument}: {CarrierContext.IdentityNationalDocument}")
+					</div>
+				</ItemTemplate>
+			</DxComboBox>
+		</div>
+		<div class="p-1 jd-toolbar-item-text">
+			Fecha Inicio
+		</div>
+		<div class="p-1">
+			<DxDateEdit Date="StartDate"
+						DateExpression="@(() => StartDate)"
+						DateChanged="@((DateTime newValue) => OnStartDateChanged(newValue))" />
+		</div>
+		<div class="p-1 jd-toolbar-item-text">
+			Fecha Final
+		</div>
+		<div class="p-1">
+			<DxDateEdit Date="EndDate"
+						DateExpression="@(() => EndDate)"
+						DateChanged="@((DateTime newValue) => OnEndDateChanged(newValue))" />
+		</div>
+		<div class="jd-separator-item"></div>
+		<div class="p-1">
+			<DxButton Text="Generar Reporte"
+					  Click="OnGenerateClicked" />
+		</div>
+	</div>
+</div>

@@ -1,0 +1,194 @@
+﻿@page "/Trips"
+@inherits DataManagerBaseComponent<TripView>
+
+<PageTitle>
+	@($"{TripManager.ComponentInformation.Title} - {Application.Title}")
+</PageTitle>
+
+<AuthorizeView Context="authorizeViewContext"
+			   Roles="@RoleDefinitions.All">
+	<Authorized>
+		<DxDataGrid @ref="DataGrid"
+					DataAsync="GetDataAsync"
+					SingleSelectedDataRow="SelectedModel"
+					SingleSelectedDataRowChanged="OnSelectedModelChanged"
+					KeyFieldName="Id"
+					EditMode="DataGridEditMode.PopupEditForm"
+					CssClass="text-primary jd-grid-header"
+					DataRowCssClass="jd-table-alt-row text-primary"
+					PopupEditFormCssClass="jd-edit-form"
+					PopupEditFormHeaderText="@string.Format("{0} {1}",
+										(DataOperation == DataOperation.Insert ? DialogButtonTexts.Add : DialogButtonTexts.Edit),
+                                        TripManager.ComponentInformation.EntitySingularName)"
+					ShowFilterRow="ShowFilterRow"
+					ShowGroupPanel="true"
+					PagerPageSizeSelectorVisible="true"
+					PagerAllDataRowsItemVisible="true"
+					PagerAllowedPageSizes="AllowedPageSizes"
+					PageSize="DefaultPageSize"
+					PagerNavigationMode=PagerNavigationMode.InputBox
+					RowEditStart="OnRowEditStarting"
+					RowClick="OnRowClick"
+					LayoutRestoring="@OnLayoutRestoring"
+					LayoutChanged="@OnLayoutChanged">
+			<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" CssClass="text-primary">
+					<DxDataGridColumnChooserToolbarItem Alignment="ToolbarItemAlignment.Right" />
+					<DxToolbarItem>
+						<Template>
+							<div class="fw-bold p-1">
+								<span class="fas fa-@(TripManager.ComponentInformation.IconCssClass)"></span>
+								<span class="ms-1">
+									@($"{TripManager.ComponentInformation.Title}")
+								</span>
+							</div>
+						</Template>
+					</DxToolbarItem>
+					<DxToolbarItem Text="@ToolbarButtonTexts.New"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-circle-plus"
+								   Tooltip="@ToolbarTooltipTexts.New"
+								   BeginGroup="true"
+								   Click="OnAddNewClick"
+								   Enabled="CurrentUserIsAdministratorOrStoreManager" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Delete"
+								   CssClass="text-primary"
+								   IconCssClass="fas fa-trash-alt"
+								   Tooltip="@ToolbarTooltipTexts.Delete"
+								   Enabled="IsAnyRowSelected && CurrentUserIsAdministratorOrStoreManager"
+								   Click="OnDeleteClick" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.ShowDetail"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-rectangle-list"
+								   Tooltip="@ToolbarTooltipTexts.ShowTripEmployees"
+								   BeginGroup="true"
+								   Enabled="IsAnyRowSelected"
+								   Click="GoToCaseActivityManager" />
+					<DxToolbarItem Text="@ToolbarButtonTexts.Update"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-rotate"
+								   Tooltip="@ToolbarTooltipTexts.Update"
+								   BeginGroup="true"
+								   Click="OnUpdateClick" />
+					<DxToolbarItem Text="@(ShowFilterRow ? ToolbarButtonTexts.HideFilters : ToolbarButtonTexts.ShowFilters)"
+								   CssClass="text-primary"
+								   IconCssClass=" fas fa-filter"
+								   Tooltip="@ToolbarTooltipTexts.ShowHideFilters"
+								   BeginGroup="true"
+								   Checked="ShowFilterRow"
+								   Click="OnShowFilterRowClick" />
+				</DxToolbar>
+			</HeaderTemplate>
+			<Columns>
+				<DxDataGridColumn Field="@($"{nameof(TripView.Carrier)}.{nameof(CarrierView.FullName)}")"
+								  Caption="@AttributeNames.Carrier" />
+				<DxDataGridColumn Field="@($"{nameof(TripView.Branch)}.{nameof(BranchView.Name)}")"
+								  Caption="@AttributeNames.Branch" />
+				<DxDataGridColumn Field="@($"{nameof(TripView.Creator)}.{nameof(EmployeeView.FullName)}")"
+								  Caption="@AttributeNames.Creator" />
+				<DxDataGridDateEditColumn Field="@nameof(TripView.Date)"
+										  Caption="@AttributeReader.GetName(nameof(TripView.Date))" />
+				<DxDataGridColumn Field="@nameof(TripView.EmployeeCount)"
+								  Caption="@AttributeReader.GetName(nameof(TripView.EmployeeCount))">
+					<DisplayTemplate>
+						<span class="d-block text-end">
+							@((context as TripView).EmployeeCount)
+						</span>
+					</DisplayTemplate>
+				</DxDataGridColumn>
+				<DxDataGridColumn Field="@nameof(TripView.TotalDistanceInKilometers)"
+										  Caption="@AttributeReader.GetName(nameof(TripView.TotalDistanceInKilometers))">
+					<DisplayTemplate>
+						<span class="d-block text-end">
+							@((context as TripView).TotalDistanceInKilometers.ToString("N2", Application.FormatDefaultCulture))
+						</span>
+					</DisplayTemplate>
+				</DxDataGridColumn>
+			</Columns>
+			<EditFormTemplate>
+				<EditForm Model="EditContext.DataItem"
+						  Context="EditFormContext"
+						  OnValidSubmit="HandleValidSubmitAsync"
+						  OnInvalidSubmit="HandleInvalidSubmitAsync">
+					<DataAnnotationsValidator></DataAnnotationsValidator>
+					<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+						<DxFormLayoutGroup Caption="@FormLayoutGroupCaptions.Trips"
+										   CssClass="pt-2"
+										   ColSpanMd="12">
+							<DxFormLayoutItem Caption="@AttributeNames.Carrier"
+											  ColSpanMd="4" ColSpanSm="4" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Carriers"
+												TextFieldName="@nameof(CarrierView.FullName)"
+												ValueFieldName="@nameof(CarrierView.Id)"
+												@bind-Value="EditContext.DataItem.CarrierId"
+												Context="CarrierContext"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+										<ItemTemplate>
+											<div class="fw-bold">
+												@CarrierContext.FullName
+											</div>
+											<div class="text-dark">
+												@($"{AttributeNames.IdentityNationalDocument}: {CarrierContext.IdentityNationalDocument}")
+											</div>
+										</ItemTemplate>
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.CarrierId)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeNames.Branch"
+											  ColSpanMd="4" ColSpanSm="4" ColSpanXs="12"
+											  Context="FormLayoutContext">
+								<Template>
+									<DxComboBox Data="Branches"
+												TextFieldName="@nameof(BranchView.Name)"
+												ValueFieldName="@nameof(BranchView.Id)"
+												@bind-Value="EditContext.DataItem.BranchId"
+												FilteringMode="DataGridFilteringMode.Contains"
+												NullText="Seleccione..."
+												ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+									</DxComboBox>
+									<ValidationMessage For="@(() => EditContext.DataItem.BranchId)" />
+								</Template>
+							</DxFormLayoutItem>
+							<DxFormLayoutItem Caption="@AttributeReader.GetName(nameof(TripView.Date))"
+											  ColSpanMd="4" ColSpanSm="4" ColSpanXs="12"
+											  Context="FormLayoutContext"
+											  CssClass="text-primary">
+								<Template>
+									<DxDateEdit @bind-Date="@EditContext.DataItem.Date" />
+									<ValidationMessage For="@(() => EditContext.DataItem.Date)" />
+								</Template>
+							</DxFormLayoutItem>
+						</DxFormLayoutGroup>
+						<DxFormLayoutItem ColSpanMd="12"
+										  Context="FormLayoutContext">
+							<Template>
+								<EditFormButtons IsSavingChanges="IsSavingChanges"
+												 SubmitFormOnClick="true"
+												 DataOperation="DataOperation"
+												 OnClickCancelButton="OnCancelButtonClick" />
+							</Template>
+						</DxFormLayoutItem>
+					</DxFormLayout>
+				</EditForm>
+			</EditFormTemplate>
+		</DxDataGrid>
+		<PopupMessage HeaderText="@DialogHeaderTexts.Confirmation"
+					  Message="@DialogMessages.ConfirmDelete"
+					  Icon="PopupMessageIcon.Question"
+					  ButtonDefaultText="PopupMessageButtonDefaultText.YesNo"
+					  Visible="@ConfirmationDialogVisible"
+					  DefaultFirstButtonOnClick="@DeleteItemsAsync"
+					  DefaultSecondButtonOnClick="@OnCancelButtonClick" />
+		<ToastMessage @ref="ToastMessage" />
+	</Authorized>
+	<NotAuthorized>
+		@{
+			NavigationManager.NavigateTo(RouteAttributeReader.GetValue(typeof(Login)));
+		}
+	</NotAuthorized>
+</AuthorizeView>

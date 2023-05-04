@@ -1,0 +1,12 @@
+﻿@page "/Configuration"
+
+<AuthorizeView>
+	<Authorized>
+		<h2 class="pb-2">Componente de Configuración</h2>
+	</Authorized>
+	<NotAuthorized>
+		@{
+			NavigationManager.NavigateTo(RouteAttributeReader.GetValue(typeof(Login)));
+		}
+	</NotAuthorized>
+</AuthorizeView>

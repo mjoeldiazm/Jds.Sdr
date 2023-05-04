@@ -1,0 +1,225 @@
+@import url('open.iconic/font/css/open-iconic-bootstrap.min.css');
+
+html, body {
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+html, body, #app {
+    height: 100%;
+    overflow: hidden;
+}
+
+#app {
+    background-color: inherit;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e74c3c;
+}
+
+.validation-message {
+    color: #e74c3c;
+    margin-top: 4px;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.splash-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column nowrap;
+    height: 100vh;
+    font-family: Roboto,"Helvetica Neue","-apple-system",BlinkMacSystemFont,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: .88rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.splash-screen .spinner-border {
+    border: .3em solid;
+    border-color: #3498db #bfbfbf #bfbfbf;
+    width: 120px;
+    height: 120px;
+}
+
+.splash-screen-caption {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+}
+
+.splash-screen-text {
+    font-size: 1rem;
+    color: #a1a1a1;
+    margin-top: .5rem;
+}
+
+.jd-table-alt-row:nth-child(odd) {
+    background-color: var(--bs-light);
+}
+
+.jd-table-alt-row:hover {
+    background-color: #d3e3ed;
+    cursor: default;
+}
+
+.jd-grid th {
+    color: white;
+    background-color: rebeccapurple;
+}
+
+.jd-grid th span {
+    color: white;
+}
+
+.jd-grid-header thead {
+    color: var(--bs-primary);
+}
+
+.column-chooser-button {
+    color: var(--bs-primary);
+}
+
+.jd-menu-button {
+    border: none;
+    color: black;
+    margin: 4px;
+    border-radius: 4px !important;
+    transition: 0.5s;
+    background-color: var(--bs-primary);
+}
+
+.jd-menu-button:hover {
+    background-color: gray;
+}
+
+.jd-menu-button:after {
+    background-color: gray;
+}
+
+.jd-menu-button:active {
+    background-color: darkgray;
+}
+
+.jd-grid-badge {
+    font-size: inherit !important;
+}
+
+.jd-edit-form {
+    min-width: 70%;
+}
+
+.jd-edit-form-50 {
+    min-width: 50%;
+}
+
+.jd-card-description {
+    font-size: 0.8125rem;
+}
+
+.card {
+    font-size: 0.8125rem;
+}
+
+.jd-edit-form-header {
+    font-size: 0.8125rem;
+}
+
+.title {
+    font-size: 1.5rem !important;
+}
+
+.jd-side-bar {
+    height: 100% !important;
+}
+
+.treeview-item-text-container {
+    font-size: 0.8rem !important;
+}
+
+a.nav-link.active {
+    border-radius: 0.25rem !important;
+    margin-left: 4px !important;
+    margin-right: 4px !important;
+    height: 2.15rem !important;
+}
+
+a.nav-link {
+    border-radius: 0.25rem !important;
+    margin-left: 4px !important;
+    margin-right: 4px !important;
+    height: 2.15rem !important;
+}
+
+li.nav-item.active {
+    border-radius: 0.25rem !important;
+}
+
+li.nav-item {
+    border-radius: 0.25rem !important;
+}
+
+.header-navbar .navbar-toggler .navbar-toggler-icon {
+    background-image: url(../images/app-logo-white-48.svg) !important;
+}
+
+.dxbl-text {
+    color: var(--bs-primary) !important;
+}
+
+.dxbl-fl-cpt {
+    color: var(--bs-primary) !important;
+}
+
+.dxbl-tabs > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active::after, .dxbl-tabs > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active::after {
+    background-color: var(--bs-primary) !important;
+}
+
+.jd-toolbar-alignment {
+    height: 40px !important;
+    padding-top: 6px !important;
+    padding-left: 2px !important;
+}
+
+.dxbl-accordion-item-text {
+    font-size: 0.8rem !important;
+}
+
+.dxbl-accordion-group-header {
+    height: 2rem !important;
+}
+
+.jd-grid-item-text {
+    font-size: 0.8rem !important;
+}
+
+#reportViewer .dxbl-modal-body {
+    padding: 0 !important;
+}
+
+.dx-grid-summary-cell {
+    color: var(--bs-primary) !important;
+}

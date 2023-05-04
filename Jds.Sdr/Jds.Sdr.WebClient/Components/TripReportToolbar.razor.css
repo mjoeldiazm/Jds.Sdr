@@ -1,0 +1,11 @@
+﻿.jd-toolbar-item-text {
+    font-size: 0.75rem;
+}
+
+.jd-separator-item {
+    width: 1px;
+    height: 1.5rem;
+    background-color: var(--bs-light);
+    margin-right: 0.25rem;
+    margin-left: 0.25rem;
+}

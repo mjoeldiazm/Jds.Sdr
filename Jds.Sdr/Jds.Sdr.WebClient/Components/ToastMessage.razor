@@ -1,0 +1,18 @@
+﻿<div class="position-fixed top-0 end-0 p-3" style="z-index: 10000">
+	<div id="@Name" class="toast jd-rounded bg-@BodyColor.ToString().ToLower()" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="toast-header jd-rounded-top bg-@HeaderColor.ToString().ToLower()">
+			@if (Icon is not PopupMessageIcon.None)
+			{
+				<span class="@IconClass rounded me-2 bg-@HeaderColor.ToString().ToLower() jd-icon-color"></span>
+			}
+			<strong class="me-auto text-@HeaderTextColor.ToString().ToLower()">@HeaderText</strong>
+			@if (CloseButtonVisible)
+			{
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="@DialogButtonTexts.Close"></button>
+			}
+		</div>
+		<div class="toast-body text-@BodyTextColor.ToString().ToLower()">
+			@Message
+		</div>
+	</div>
+</div>
